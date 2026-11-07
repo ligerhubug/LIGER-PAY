@@ -1,0 +1,321 @@
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #101827;
+  color: #ffffff;
+  font-family: Arial, sans-serif;
+}
+
+a {
+  color: #e3bd65;
+  text-decoration: none;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 5%;
+  background: #172235;
+  border-bottom: 1px solid #29384e;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #e3bd65;
+  font-size: 19px;
+}
+
+.brand small {
+  display: block;
+  color: #aab6c7;
+  font-size: 10px;
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+
+.logo {
+  width: 43px;
+  height: 43px;
+  display: grid;
+  place-items: center;
+  background: #d5aa45;
+  color: #101827;
+  font-weight: 900;
+  border-radius: 12px;
+}
+
+.profile {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #d5aa45;
+  color: #101827;
+  font-weight: bold;
+}
+
+.container {
+  width: 90%;
+  max-width: 900px;
+  margin: 25px auto 100px;
+}
+
+.welcome {
+  padding: 20px 0;
+}
+
+.welcome p {
+  color: #aab6c7;
+}
+
+.welcome h1 {
+  font-size: 30px;
+  margin: 8px 0;
+}
+
+.account-access,
+.wallet,
+.transactions,
+.services {
+  background: #172235;
+  border: 1px solid #29384e;
+  border-radius: 17px;
+  padding: 20px;
+  margin: 18px 0;
+}
+
+.account-access p,
+.transactions p {
+  color: #aab6c7;
+  line-height: 1.5;
+}
+
+.access-buttons,
+.wallet-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.access-buttons a,
+.wallet-actions a {
+  display: inline-block;
+  padding: 12px 17px;
+  border-radius: 9px;
+  background: #d5aa45;
+  color: #101827;
+  font-weight: bold;
+}
+
+.access-buttons a:last-child,
+.wallet-actions a:last-child {
+  background: #293a52;
+  color: #ffffff;
+}
+
+.wallet p {
+  color: #aab6c7;
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+
+.wallet h2 {
+  color: #e3bd65;
+  font-size: 30px;
+  margin: 10px 0;
+}
+
+.services h2,
+.transactions h2,
+.account-access h2 {
+  margin-top: 0;
+}
+
+.service-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.service-item {
+  min-height: 115px;
+  padding: 15px;
+  background: #1b293d;
+  border: 1px solid #314158;
+  border-radius: 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  color: #ffffff;
+}
+
+.service-item span {
+  color: #e3bd65;
+  font-size: 23px;
+}
+
+.service-item strong {
+  font-size: 14px;
+}
+
+.service-item small {
+  color: #aab6c7;
+  font-size: 12px;
+}
+
+.service-item:active {
+  transform: scale(.98);
+}
+
+.transactions a {
+  display: inline-block;
+  margin-top: 8px;
+}
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  padding: 16px 5px;
+  background: #172235;
+  border-top: 1px solid #29384e;
+  z-index: 10;
+}
+
+.bottom-nav a {
+  color: #e3bd65;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.message {
+  color: #e3bd65;
+  margin: 15px 0;
+}
+
+/* Login and registration pages */
+
+.auth-container {
+  width: 90%;
+  max-width: 440px;
+  margin: 35px auto;
+}
+
+.auth-logo {
+  text-align: center;
+  color: #e3bd65;
+  font-size: 27px;
+  font-weight: 900;
+  margin: 25px 0;
+}
+
+.auth-card {
+  background: #172235;
+  border: 1px solid #29384e;
+  border-radius: 18px;
+  padding: 25px;
+}
+
+.auth-card h1 {
+  margin-top: 0;
+}
+
+.auth-card p {
+  color: #aab6c7;
+  line-height: 1.5;
+}
+
+.auth-card label {
+  display: block;
+  margin: 17px 0 8px;
+  font-size: 14px;
+}
+
+.auth-card input {
+  width: 100%;
+  padding: 14px;
+  background: #101827;
+  border: 1px solid #3a4960;
+  color: white;
+  border-radius: 9px;
+  font-size: 15px;
+}
+
+.password-field {
+  display: flex;
+  gap: 8px;
+}
+
+.password-field input {
+  flex: 1;
+  min-width: 0;
+}
+
+.password-field button {
+  padding: 0 12px;
+  background: #293a52;
+  color: white;
+  border: 0;
+  border-radius: 9px;
+}
+
+.auth-button {
+  width: 100%;
+  padding: 15px;
+  margin-top: 22px;
+  background: #d5aa45;
+  color: #101827;
+  border: 0;
+  border-radius: 9px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.auth-note,
+.demo-warning {
+  background: #332b19;
+  border: 1px solid #66542a;
+  color: #f0d99d;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  margin-top: 16px;
+}
+
+.back-link {
+  display: block;
+  margin-top: 20px;
+  text-align: center;
+}
+
+@media (max-width: 420px) {
+  .container {
+    width: 92%;
+  }
+
+  .welcome h1 {
+    font-size: 25px;
+  }
+
+  .service-grid {
+    gap: 9px;
+  }
+
+  .service-item {
+    padding: 12px;
+  }
+}

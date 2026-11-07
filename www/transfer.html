@@ -1,0 +1,486 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Send Money | LIGER-PAY</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+margin:0;
+background:#101827;
+color:white;
+font-family:Arial,sans-serif;
+padding:18px;
+}
+
+.container{max-width:500px;margin:auto}
+
+header{
+display:flex;
+justify-content:space-between;
+margin-bottom:25px;
+}
+
+.brand{
+color:#e3bd65;
+font-weight:bold;
+font-size:21px;
+}
+
+a{color:#e3bd65;text-decoration:none}
+
+.card,.dialog{
+background:#172235;
+border:1px solid #29384e;
+border-radius:17px;
+padding:22px;
+}
+
+h1{margin-top:0}
+
+.muted{
+color:#aab6c7;
+font-size:14px;
+line-height:1.5;
+}
+
+.balance{
+font-size:27px;
+color:#e3bd65;
+font-weight:bold;
+}
+
+label{
+display:block;
+margin:16px 0 8px;
+}
+
+input{
+width:100%;
+padding:14px;
+background:#101827;
+color:white;
+border:1px solid #3a4960;
+border-radius:9px;
+font-size:16px;
+}
+
+button{
+width:100%;
+padding:15px;
+border:0;
+border-radius:10px;
+font-size:15px;
+font-weight:bold;
+margin-top:15px;
+cursor:pointer;
+}
+
+.primary{
+background:#d5aa45;
+color:#101827;
+}
+
+.secondary{
+background:#293a52;
+color:white;
+}
+
+.notice{
+background:#332b19;
+border:1px solid #66542a;
+color:#f0d99d;
+padding:12px;
+border-radius:10px;
+font-size:12px;
+line-height:1.5;
+margin-top:18px;
+}
+
+.modal{
+display:none;
+position:fixed;
+inset:0;
+background:#000b;
+z-index:10;
+align-items:center;
+justify-content:center;
+padding:18px;
+}
+
+.modal.show{display:flex}
+
+.dialog{
+width:100%;
+max-width:400px;
+border-color:#d5aa45;
+}
+
+.modal-actions{
+display:flex;
+gap:10px;
+}
+
+.modal-actions button{flex:1}
+
+#resultText{
+white-space:pre-wrap;
+line-height:1.6;
+color:#dce3ed;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<header>
+<div class="brand">LIGER-PAY</div>
+<a href="index.html">← Home</a>
+</header>
+
+<div class="card">
+
+<h1>Send Money</h1>
+
+<p class="muted">Available demo balance</p>
+
+<div class="balance" id="balance">UGX 0</div>
+
+<form id="transferForm">
+
+<label for="recipient">Recipient phone number</label>
+
+<input
+id="recipient"
+type="tel"
+placeholder="0701234567"
+required
+>
+
+<label for="amount">Amount (UGX)</label>
+
+<input
+id="amount"
+type="number"
+min="1"
+step="1"
+placeholder="Enter amount"
+required
+>
+
+<label for="note">Payment description</label>
+
+<input
+id="note"
+type="text"
+maxlength="60"
+placeholder="e.g. Design payment"
+>
+
+<button class="primary" type="submit">
+Review Transfer
+</button>
+
+</form>
+
+<div class="notice">
+DEMO ONLY: No real money is sent to the recipient.
+</div>
+
+</div>
+</div>
+
+<!-- CONFIRM TRANSFER -->
+
+<div class="modal" id="confirmModal">
+
+<div class="dialog">
+
+<h2>Confirm Transfer</h2>
+
+<p id="confirmText" class="muted"></p>
+
+<div class="modal-actions">
+
+<button class="secondary" onclick="closeConfirm()">
+Cancel
+</button>
+
+<button class="primary" onclick="completeTransfer()">
+Confirm
+</button>
+
+</div>
+</div>
+</div>
+
+<!-- RESULT -->
+
+<div class="modal" id="resultModal">
+
+<div class="dialog">
+
+<h2 id="resultTitle">Transfer Result</h2>
+
+<p id="resultText"></p>
+
+<button class="primary" onclick="closeResult()">
+OK
+</button>
+
+</div>
+</div>
+
+<script>
+/* LIGER-PAY TRANSFER SYSTEM */
+
+const BK = "ligerDemoBalance";
+const TK = "ligerDemoTransactions";
+
+let pending = null;
+
+const money = n =>
+"UGX " + Number(n).toLocaleString("en-UG");
+
+function balance(){
+
+return Math.max(
+0,
+Number(localStorage.getItem(BK) || 0)
+);
+
+}
+
+function list(){
+
+try{
+
+const data = JSON.parse(
+localStorage.getItem(TK) || "[]"
+);
+
+return Array.isArray(data) ? data : [];
+
+}catch(e){
+
+return [];
+
+}
+
+}
+
+function show(id){
+
+document.getElementById(id)
+.classList.add("show");
+
+}
+
+function hide(id){
+
+document.getElementById(id)
+.classList.remove("show");
+
+}
+
+function closeConfirm(){
+
+hide("confirmModal");
+
+}
+
+function closeResult(){
+
+hide("resultModal");
+
+}
+
+function message(title,text){
+
+document.getElementById(
+"resultTitle"
+).textContent = title;
+
+document.getElementById(
+"resultText"
+).textContent = text;
+
+show("resultModal");
+
+}
+
+function updateBalance(){
+
+document.getElementById(
+"balance"
+).textContent = money(balance());
+
+}
+
+updateBalance();
+
+/* REVIEW TRANSFER */
+
+document.getElementById(
+"transferForm"
+).addEventListener("submit",function(e){
+
+e.preventDefault();
+
+const phone = document.getElementById(
+"recipient"
+).value.trim().replace(/\s+/g,"");
+
+const amount = Number(
+document.getElementById("amount").value
+);
+
+const note = document.getElementById(
+"note"
+).value.trim();
+
+if(!/^(0\d{9}|\+256\d{9}|256\d{9})$/.test(phone)){
+
+message(
+"Invalid Phone Number",
+"Enter a valid Ugandan phone number, for example 0701234567."
+);
+
+return;
+
+}
+
+if(
+!Number.isSafeInteger(amount) ||
+amount < 1 ||
+amount > 100000000
+){
+
+message(
+"Invalid Amount",
+"Enter a valid whole amount."
+);
+
+return;
+
+}
+
+if(amount > balance()){
+
+message(
+"Insufficient Balance",
+"Your demo wallet does not have enough funds."
+);
+
+return;
+
+}
+
+pending = {
+phone:phone,
+amount:amount,
+note:note
+};
+
+document.getElementById(
+"confirmText"
+).textContent =
+
+"Recipient: " + phone +
+"\nAmount: " + money(amount) +
+"\nDescription: " + (note || "Not provided") +
+"\n\nConfirm this simulated transfer? No real money will be sent.";
+
+show("confirmModal");
+
+});
+
+/* COMPLETE TRANSFER */
+
+function completeTransfer(){
+
+if(!pending)return;
+
+const current = balance();
+
+if(pending.amount > current){
+
+closeConfirm();
+
+message(
+"Insufficient Balance",
+"Your balance has changed. Please try again."
+);
+
+return;
+
+}
+
+const reference = "LGP" + Date.now();
+
+const transactions = list();
+
+transactions.unshift({
+
+reference:reference,
+
+type:"transfer",
+
+amount:pending.amount,
+
+recipient:pending.phone,
+
+note:pending.note,
+
+date:new Date().toISOString(),
+
+status:"DEMO COMPLETED"
+
+});
+
+localStorage.setItem(
+BK,
+String(current - pending.amount)
+);
+
+localStorage.setItem(
+TK,
+JSON.stringify(transactions)
+);
+
+const completed = pending;
+
+pending = null;
+
+closeConfirm();
+
+updateBalance();
+
+document.getElementById(
+"transferForm"
+).reset();
+
+message(
+"Transfer Recorded",
+
+"Amount: " + money(completed.amount) +
+"\nRecipient: " + completed.phone +
+"\nReference: " + reference +
+"\n\nThis was a demo only. No real money was sent."
+);
+
+}
+
+</script>
+
+<!-- ACCOUNT PROTECTION -->
+<script src="security.js"></script>
+
+</body>
+</html>

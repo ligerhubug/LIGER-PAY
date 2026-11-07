@@ -1,0 +1,82 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101827">
+  <title>Create Account | LIGER-PAY</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="auth-container">
+
+    <div class="auth-logo">
+      <span class="logo">L</span>
+      <h2>LIGER-PAY</h2>
+      <p>Join our payment platform.</p>
+    </div>
+
+    <form id="registerForm" class="auth-card">
+
+      <h2>Create Account</h2>
+      <p>Enter your details below.</p>
+
+      <label>Full Name</label>
+      <input
+        type="text"
+        id="fullName"
+        placeholder="Your full name"
+        required
+      >
+
+      <label>Phone Number</label>
+      <input
+        type="tel"
+        id="registerPhone"
+        placeholder="e.g. 256700000000"
+        required
+      >
+
+      <label>Password</label>
+      <div class="password-field">
+        <input
+          type="password"
+          id="registerPassword"
+          placeholder="Create a password"
+          minlength="8"
+          required
+        >
+        <button type="button" onclick="togglePassword('registerPassword', this)">Show</button>
+      </div>
+
+      <label>Confirm Password</label>
+      <input
+        type="password"
+        id="confirmPassword"
+        placeholder="Confirm your password"
+        minlength="8"
+        required
+      >
+
+      <button type="submit" class="auth-button">
+        Create Account
+      </button>
+
+      <p class="auth-note">
+        Already registered?
+        <a href="login.html">Sign In</a>
+      </p>
+
+      <a class="back-link" href="index.html">Back to Home</a>
+
+    </form>
+
+    <p class="demo-warning">DEMO VERSION — Do not enter real passwords.</p>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

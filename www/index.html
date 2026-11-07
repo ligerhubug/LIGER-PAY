@@ -1,0 +1,125 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LIGER-PAY | Pay Smart. Move Money.</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="header">
+    <div class="brand">
+      <div class="logo">LP</div>
+      <div>
+        <strong>LIGER-PAY</strong>
+        <small>PAY SMART. MOVE MONEY.</small>
+      </div>
+    </div>
+    <a class="profile" href="login.html">LP</a>
+  </header>
+
+  <main class="container">
+    <section class="welcome">
+      <p>WELCOME TO LIGER-PAY</p>
+      <h1>Hello, <span id="welcomeName">there</span>!</h1>
+      <p>Your simple digital payment dashboard.</p>
+    </section>
+
+    <section class="account-access">
+      <h2>Account Access</h2>
+      <p>Sign in to your demo account or create a new one.</p>
+      <div class="access-buttons">
+        <a href="login.html">Sign In</a>
+        <a href="register.html">Register</a>
+      </div>
+    </section>
+
+    <section class="wallet">
+      <p>MY DEMO WALLET BALANCE</p>
+      <h2 id="balance">UGX 0</h2>
+      <div class="wallet-actions">
+        <a href="wallet.html">Add Demo Funds</a>
+        <a href="wallet.html">View Wallet</a>
+      </div>
+    </section>
+
+    <section class="services">
+      <h2>Payment Services</h2>
+      <div class="service-grid">
+        <a class="service-item" href="transfer.html">
+          <span>↗</span>
+          <strong>Send Money</strong>
+          <small>Demo transfer</small>
+        </a>
+
+        <a class="service-item" href="receive.html">
+          <span>↙</span>
+          <strong>Receive Money</strong>
+          <small>Request payment</small>
+        </a>
+
+        <a class="service-item" href="wallet.html">
+          <span>▣</span>
+          <strong>My Wallet</strong>
+          <small>Balance and history</small>
+        </a>
+
+        <a class="service-item" href="#" onclick="comingSoon(event,'Mobile Money')">
+          <span>▤</span>
+          <strong>Mobile Money</strong>
+          <small>MTN and Airtel</small>
+        </a>
+
+        <a class="service-item" href="#" onclick="comingSoon(event,'Utility Bills')">
+          <span>⚡</span>
+          <strong>Utility Bills</strong>
+          <small>Coming soon</small>
+        </a>
+
+        <a class="service-item" href="#" onclick="comingSoon(event,'QR Payments')">
+          <span>▦</span>
+          <strong>QR Payments</strong>
+          <small>Coming soon</small>
+        </a>
+
+        <a class="service-item" href="#" onclick="comingSoon(event,'Business Accounts')">
+          <span>▣</span>
+          <strong>Business</strong>
+          <small>Coming soon</small>
+        </a>
+
+        <a class="service-item" href="#" onclick="comingSoon(event,'Bank Transfers')">
+          <span>⇄</span>
+          <strong>Bank Transfer</strong>
+          <small>Coming soon</small>
+        </a>
+      </div>
+    </section>
+
+    <section class="transactions">
+      <h2>Recent Activity</h2>
+      <p>Open your wallet to view your demo transaction history.</p>
+      <a href="wallet.html">View transaction history →</a>
+    </section>
+
+    <div id="message" class="message"></div>
+  </main>
+
+  <nav class="bottom-nav">
+    <a href="index.html">Home</a>
+    <a href="transfer.html">Send</a>
+    <a href="wallet.html">Wallet</a>
+    <a href="login.html">Account</a>
+  </nav>
+
+  <script src="script.js"></script>
+  <script>
+    function comingSoon(event,service){
+      event.preventDefault();
+      alert(service+" is not connected yet. It will be developed in a future stage.");
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,544 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Receive Money | LIGER-PAY</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+margin:0;
+background:#101827;
+color:white;
+font-family:Arial,sans-serif;
+padding:18px;
+}
+
+.container{max-width:500px;margin:auto}
+
+header{
+display:flex;
+justify-content:space-between;
+margin-bottom:25px;
+}
+
+.brand{
+color:#e3bd65;
+font-size:21px;
+font-weight:bold;
+}
+
+a{color:#e3bd65;text-decoration:none}
+
+.card,.dialog{
+background:#172235;
+border:1px solid #29384e;
+border-radius:17px;
+padding:22px;
+}
+
+h1{margin-top:0}
+
+.muted{
+color:#aab6c7;
+font-size:14px;
+line-height:1.5;
+}
+
+label{display:block;margin:16px 0 8px}
+
+input{
+width:100%;
+padding:14px;
+background:#101827;
+color:white;
+border:1px solid #3a4960;
+border-radius:9px;
+font-size:16px;
+}
+
+button{
+width:100%;
+padding:15px;
+border:0;
+border-radius:10px;
+font-size:15px;
+font-weight:bold;
+margin-top:15px;
+cursor:pointer;
+}
+
+.primary{
+background:#d5aa45;
+color:#101827;
+}
+
+.secondary{
+background:#293a52;
+color:white;
+}
+
+.reference{
+color:#e3bd65;
+font-weight:bold;
+font-size:19px;
+overflow-wrap:anywhere;
+}
+
+.request{
+display:none;
+margin-top:20px;
+padding:15px;
+background:#101827;
+border:1px dashed #d5aa45;
+border-radius:10px;
+}
+
+.notice{
+background:#332b19;
+border:1px solid #66542a;
+color:#f0d99d;
+padding:12px;
+border-radius:10px;
+font-size:12px;
+line-height:1.5;
+margin-top:18px;
+}
+
+.modal{
+display:none;
+position:fixed;
+inset:0;
+background:#000b;
+z-index:10;
+align-items:center;
+justify-content:center;
+padding:18px;
+}
+
+.modal.show{display:flex}
+
+.dialog{
+width:100%;
+max-width:400px;
+border-color:#d5aa45;
+}
+
+.modal-actions{
+display:flex;
+gap:10px;
+}
+
+.modal-actions button{flex:1}
+
+#resultText{
+white-space:pre-wrap;
+line-height:1.6;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<header>
+<div class="brand">LIGER-PAY</div>
+<a href="index.html">← Home</a>
+</header>
+
+<div class="card">
+
+<h1>Receive Money</h1>
+
+<p class="muted">
+Create a demo payment request.
+</p>
+
+<form id="requestForm">
+
+<label for="payer">
+Payer's phone number (optional)
+</label>
+
+<input
+id="payer"
+type="tel"
+placeholder="0701234567"
+>
+
+<label for="requestAmount">
+Amount (UGX)
+</label>
+
+<input
+id="requestAmount"
+type="number"
+min="1"
+step="1"
+placeholder="Enter amount"
+required
+>
+
+<label for="description">
+Payment description
+</label>
+
+<input
+id="description"
+type="text"
+maxlength="60"
+placeholder="e.g. Graphic design"
+>
+
+<button type="submit" class="primary">
+Review Request
+</button>
+
+</form>
+
+<div id="requestResult" class="request">
+
+<p class="muted">
+Payment request reference
+</p>
+
+<div id="reference" class="reference"></div>
+
+<p id="requestDetails" class="muted"></p>
+
+<button
+id="copyButton"
+class="secondary"
+type="button"
+>
+Copy Request Details
+</button>
+
+</div>
+
+<div class="notice">
+DEMO ONLY: A payment request is not proof of payment.
+Your wallet will not be credited until a real payment
+provider confirms payment.
+</div>
+
+</div>
+</div>
+
+<!-- CONFIRM REQUEST -->
+
+<div class="modal" id="confirmModal">
+
+<div class="dialog">
+
+<h2>Confirm Request</h2>
+
+<p id="confirmText" class="muted"></p>
+
+<div class="modal-actions">
+
+<button class="secondary" onclick="closeConfirm()">
+Cancel
+</button>
+
+<button class="primary" onclick="createRequest()">
+Confirm
+</button>
+
+</div>
+</div>
+</div>
+
+<!-- RESULT MESSAGE -->
+
+<div class="modal" id="resultModal">
+
+<div class="dialog">
+
+<h2 id="resultTitle">Message</h2>
+
+<p id="resultText"></p>
+
+<button class="primary" onclick="closeResult()">
+OK
+</button>
+
+</div>
+</div>
+
+<script>
+
+/* LIGER-PAY RECEIVE MONEY SYSTEM */
+
+let pending = null;
+let shareText = "";
+
+function show(id){
+
+document.getElementById(id)
+.classList.add("show");
+
+}
+
+function hide(id){
+
+document.getElementById(id)
+.classList.remove("show");
+
+}
+
+function closeConfirm(){
+
+hide("confirmModal");
+
+}
+
+function closeResult(){
+
+hide("resultModal");
+
+}
+
+function message(title,text){
+
+document.getElementById(
+"resultTitle"
+).textContent = title;
+
+document.getElementById(
+"resultText"
+).textContent = text;
+
+show("resultModal");
+
+}
+
+/* REVIEW PAYMENT REQUEST */
+
+document.getElementById(
+"requestForm"
+).addEventListener("submit",function(e){
+
+e.preventDefault();
+
+const payer = document.getElementById(
+"payer"
+).value.trim().replace(/\s+/g,"");
+
+const amount = Number(
+document.getElementById("requestAmount").value
+);
+
+const description = document.getElementById(
+"description"
+).value.trim();
+
+if(
+payer &&
+!/^(0\d{9}|\+256\d{9}|256\d{9})$/.test(payer)
+){
+
+message(
+"Invalid Phone Number",
+"Enter a valid Ugandan phone number or leave the field blank."
+);
+
+return;
+
+}
+
+if(
+!Number.isSafeInteger(amount) ||
+amount < 1 ||
+amount > 100000000
+){
+
+message(
+"Invalid Amount",
+"Enter a valid whole amount between UGX 1 and UGX 100,000,000."
+);
+
+return;
+
+}
+
+pending = {
+payer:payer,
+amount:amount,
+description:description
+};
+
+document.getElementById(
+"confirmText"
+).textContent =
+
+"Amount requested: UGX " +
+amount.toLocaleString("en-UG") +
+
+"\nPayer: " + (payer || "Not specified") +
+
+"\nDescription: " + (description || "Payment") +
+
+"\n\nCreate this demo request?";
+
+show("confirmModal");
+
+});
+
+/* CREATE REQUEST */
+
+function createRequest(){
+
+if(!pending)return;
+
+const reference = "LGR" + Date.now();
+
+let requests = [];
+
+try{
+
+const saved = JSON.parse(
+localStorage.getItem("ligerDemoRequests") || "[]"
+);
+
+requests = Array.isArray(saved) ? saved : [];
+
+}catch(e){
+
+requests = [];
+
+}
+
+requests.unshift({
+
+reference:reference,
+
+amount:pending.amount,
+
+payer:pending.payer,
+
+description:pending.description,
+
+date:new Date().toISOString(),
+
+status:"REQUEST CREATED - NOT PAID"
+
+});
+
+localStorage.setItem(
+"ligerDemoRequests",
+JSON.stringify(requests)
+);
+
+shareText =
+"LIGER-PAY DEMO PAYMENT REQUEST\n" +
+
+"Reference: " + reference +
+
+"\nAmount: UGX " +
+pending.amount.toLocaleString("en-UG") +
+
+"\nReason: " +
+(pending.description || "Payment") +
+
+"\nPayer: " +
+(pending.payer || "Not specified") +
+
+"\nThis request is not proof of payment.";
+
+document.getElementById(
+"reference"
+).textContent = reference;
+
+document.getElementById(
+"requestDetails"
+).textContent =
+
+"Amount: UGX " +
+pending.amount.toLocaleString("en-UG") +
+
+" | Reason: " +
+(pending.description || "Payment");
+
+document.getElementById(
+"requestResult"
+).style.display = "block";
+
+pending = null;
+
+closeConfirm();
+
+document.getElementById(
+"requestForm"
+).reset();
+
+message(
+"Request Created",
+"Your demo payment request has been created. It has not received any money."
+);
+
+}
+
+/* COPY REQUEST DETAILS */
+
+document.getElementById(
+"copyButton"
+).addEventListener("click",async function(){
+
+try{
+
+if(
+navigator.clipboard &&
+navigator.clipboard.writeText
+){
+
+await navigator.clipboard.writeText(shareText);
+
+message(
+"Copied Successfully",
+"Your demo request details have been copied."
+);
+
+}else{
+
+throw new Error("Clipboard unavailable");
+
+}
+
+}catch(e){
+
+const area = document.createElement("textarea");
+
+area.value = shareText;
+
+document.body.appendChild(area);
+
+area.select();
+
+const copied = document.execCommand("copy");
+
+area.remove();
+
+message(
+copied ? "Copied Successfully" : "Copy Not Available",
+
+copied
+? "Your demo request details have been copied."
+: "Please select and copy the request details manually."
+);
+
+}
+
+});
+
+</script>
+
+<!-- ACCOUNT PROTECTION -->
+<script src="security.js"></script>
+
+</body>
+</html>

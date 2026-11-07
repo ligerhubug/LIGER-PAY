@@ -1,0 +1,564 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LIGER-PAY Wallet</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+margin:0;
+background:#101827;
+color:white;
+font-family:Arial,sans-serif;
+padding:18px;
+}
+
+.container{max-width:500px;margin:auto}
+
+header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:25px;
+}
+
+.brand{
+font-size:21px;
+font-weight:bold;
+color:#e3bd65;
+}
+
+a{color:#e3bd65;text-decoration:none}
+
+.card{
+background:#172235;
+border:1px solid #29384e;
+border-radius:17px;
+padding:20px;
+margin-bottom:18px;
+}
+
+.balance{
+font-size:30px;
+color:#e3bd65;
+font-weight:bold;
+margin:12px 0;
+}
+
+button{
+border:0;
+border-radius:10px;
+padding:14px;
+font-weight:bold;
+font-size:15px;
+cursor:pointer;
+}
+
+.primary{background:#d5aa45;color:#101827}
+.secondary{background:#293a52;color:white}
+
+.actions{display:flex;gap:10px}
+.actions button{flex:1}
+
+input{
+width:100%;
+padding:14px;
+background:#101827;
+border:1px solid #3a4960;
+border-radius:9px;
+color:white;
+font-size:16px;
+}
+
+label{display:block;margin:15px 0 8px}
+
+.item{
+background:#1b293d;
+border-radius:10px;
+padding:13px;
+margin-top:10px;
+}
+
+.muted{
+color:#aab6c7;
+font-size:13px;
+line-height:1.5;
+}
+
+.modal{
+display:none;
+position:fixed;
+inset:0;
+background:#000b;
+z-index:10;
+align-items:center;
+justify-content:center;
+padding:18px;
+}
+
+.modal.show{display:flex}
+
+.modal-card{
+width:100%;
+max-width:400px;
+background:#172235;
+border:1px solid #d5aa45;
+border-radius:17px;
+padding:22px;
+}
+
+.modal-card h2{margin-top:0}
+
+.modal-actions{
+display:flex;
+gap:10px;
+margin-top:20px;
+}
+
+.modal-actions button{flex:1}
+
+#modalMessage{
+color:#e3bd65;
+line-height:1.6;
+white-space:pre-wrap;
+}
+
+.notice{
+background:#332b19;
+border:1px solid #66542a;
+padding:12px;
+border-radius:10px;
+color:#f0d99d;
+font-size:12px;
+line-height:1.5;
+}
+
+.history-link{
+display:block;
+text-align:center;
+padding:14px;
+background:#293a52;
+border-radius:10px;
+margin-top:15px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<header>
+<div class="brand">LIGER-PAY</div>
+<a href="index.html">← Home</a>
+</header>
+
+<div class="card">
+<h2>My Demo Wallet</h2>
+<p class="muted">Available balance</p>
+
+<div class="balance" id="walletBalance">UGX 0</div>
+
+<div class="actions">
+<button class="primary" onclick="openModal('add')">Add Funds</button>
+<button class="secondary" onclick="openModal('withdraw')">Withdraw</button>
+</div>
+</div>
+
+<div class="card">
+<h2>Recent Transactions</h2>
+
+<div id="walletTransactions"></div>
+
+<a class="history-link" href="history.html">
+View All Transactions →
+</a>
+</div>
+
+<div class="notice">
+DEMO VERSION: These funds have no real monetary value.
+No actual deposits or withdrawals occur.
+</div>
+
+</div>
+
+<!-- AMOUNT MODAL -->
+<div class="modal" id="amountModal">
+
+<div class="modal-card">
+
+<h2 id="modalTitle">Add Demo Funds</h2>
+
+<p class="muted" id="modalDescription">
+Enter an amount.
+</p>
+
+<label for="walletAmount">Amount (UGX)</label>
+
+<input
+type="number"
+id="walletAmount"
+min="1"
+step="1"
+placeholder="Enter amount"
+>
+
+<div class="modal-actions">
+
+<button class="secondary" onclick="closeModal()">
+Cancel
+</button>
+
+<button class="primary" onclick="reviewAmount()">
+Continue
+</button>
+
+</div>
+</div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal" id="confirmModal">
+
+<div class="modal-card">
+
+<h2>Confirm Action</h2>
+
+<p id="confirmText" class="muted"></p>
+
+<div class="modal-actions">
+
+<button class="secondary" onclick="closeConfirm()">
+Cancel
+</button>
+
+<button class="primary" onclick="completeAction()">
+Confirm
+</button>
+
+</div>
+</div>
+</div>
+
+<!-- RESULT MODAL -->
+<div class="modal" id="resultModal">
+
+<div class="modal-card">
+
+<h2 id="resultTitle">Successful</h2>
+
+<p id="modalMessage"></p>
+
+<button
+class="primary"
+style="width:100%;margin-top:20px"
+onclick="closeResult()"
+>
+OK
+</button>
+
+</div>
+</div>
+
+<script>
+/* WALLET SYSTEM */
+
+const BK = "ligerDemoBalance";
+const TK = "ligerDemoTransactions";
+
+let currentAction = "add";
+let pendingAmount = 0;
+
+function balance(){
+return Math.max(
+0,
+Number(localStorage.getItem(BK) || 0)
+);
+}
+
+function transactions(){
+
+try{
+
+const list = JSON.parse(
+localStorage.getItem(TK) || "[]"
+);
+
+return Array.isArray(list) ? list : [];
+
+}catch(e){
+
+return [];
+
+}
+
+}
+
+function money(n){
+
+return "UGX " +
+Number(n || 0).toLocaleString("en-UG");
+
+}
+
+function update(){
+
+document.getElementById(
+"walletBalance"
+).textContent = money(balance());
+
+renderTransactions();
+
+}
+
+function show(id){
+
+document.getElementById(id)
+.classList.add("show");
+
+}
+
+function hide(id){
+
+document.getElementById(id)
+.classList.remove("show");
+
+}
+
+function openModal(action){
+
+currentAction = action;
+
+document.getElementById(
+"modalTitle"
+).textContent =
+action === "add"
+? "Add Demo Funds"
+: "Withdraw Demo Funds";
+
+document.getElementById(
+"modalDescription"
+).textContent =
+action === "add"
+? "Enter the amount to add to your demo wallet."
+: "Enter the amount to withdraw from your demo wallet.";
+
+document.getElementById(
+"walletAmount"
+).value = "";
+
+show("amountModal");
+
+}
+
+function closeModal(){
+hide("amountModal");
+}
+
+function closeConfirm(){
+hide("confirmModal");
+}
+
+function closeResult(){
+hide("resultModal");
+}
+
+function reviewAmount(){
+
+const amount = Number(
+document.getElementById("walletAmount").value
+);
+
+if(
+!Number.isSafeInteger(amount) ||
+amount < 1 ||
+amount > 100000000
+){
+
+result(
+"Invalid Amount",
+"Enter a whole amount between UGX 1 and UGX 100,000,000."
+);
+
+return;
+
+}
+
+if(
+currentAction === "withdraw" &&
+amount > balance()
+){
+
+result(
+"Insufficient Balance",
+"Your demo wallet does not have enough funds."
+);
+
+return;
+
+}
+
+pendingAmount = amount;
+
+document.getElementById(
+"confirmText"
+).textContent =
+(currentAction === "add" ? "Add " : "Withdraw ") +
+money(amount) +
+"?\n\nThis is a simulated wallet transaction only.";
+
+closeModal();
+
+show("confirmModal");
+
+}
+
+function completeAction(){
+
+const old = balance();
+
+const next =
+currentAction === "add"
+? old + pendingAmount
+: old - pendingAmount;
+
+if(!Number.isSafeInteger(next) || next < 0){
+
+closeConfirm();
+
+result(
+"Unable to complete",
+"Please check your wallet amount."
+);
+
+return;
+
+}
+
+const reference = "LGP" + Date.now();
+
+const list = transactions();
+
+list.unshift({
+
+reference: reference,
+
+type:
+currentAction === "add"
+? "deposit"
+: "withdrawal",
+
+amount: pendingAmount,
+
+date: new Date().toISOString(),
+
+status: "DEMO COMPLETED"
+
+});
+
+localStorage.setItem(BK,String(next));
+
+localStorage.setItem(TK,JSON.stringify(list));
+
+closeConfirm();
+
+update();
+
+result(
+"Transaction Successful",
+money(pendingAmount) +
+" " +
+(currentAction === "add" ? "added to" : "withdrawn from") +
+" your demo wallet.\nReference: " +
+reference +
+"\nNo real money moved."
+);
+
+}
+
+function result(title,message){
+
+document.getElementById(
+"resultTitle"
+).textContent = title;
+
+document.getElementById(
+"modalMessage"
+).textContent = message;
+
+show("resultModal");
+
+}
+
+function renderTransactions(){
+
+const box = document.getElementById(
+"walletTransactions"
+);
+
+const list = transactions();
+
+box.innerHTML = "";
+
+if(!list.length){
+
+box.innerHTML =
+'<p class="muted">No transactions yet.</p>';
+
+return;
+
+}
+
+list.slice(0,5).forEach(t => {
+
+const div = document.createElement("div");
+
+div.className = "item";
+
+const label =
+t.type === "deposit"
+? "Demo deposit"
+: t.type === "withdrawal"
+? "Demo withdrawal"
+: t.type === "transfer"
+? "Demo transfer"
+: "Transaction";
+
+const sign =
+t.type === "deposit" ? "+" : "-";
+
+div.textContent =
+label + " · " + sign + money(t.amount);
+
+const detail = document.createElement("p");
+
+detail.className = "muted";
+
+detail.textContent =
+(t.date ? new Date(t.date).toLocaleString() : "") +
+" · " +
+(t.status || "DEMO");
+
+div.appendChild(detail);
+
+box.appendChild(div);
+
+});
+
+}
+
+/* INITIALISE WALLET */
+
+update();
+
+</script>
+
+<!-- ACCOUNT PROTECTION -->
+<script src="security.js"></script>
+
+</body>
+</html>

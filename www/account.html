@@ -1,0 +1,435 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101827">
+<title>My Account | LIGER-PAY</title>
+<link rel="stylesheet" href="style.css">
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 18px;
+    background: #101827;
+    color: white;
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    max-width: 480px;
+    margin: auto;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.brand {
+    color: #e3bd65;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.back {
+    color: #e3bd65;
+    text-decoration: none;
+}
+
+.page-title {
+    margin-bottom: 20px;
+}
+
+.page-title h2 {
+    margin-bottom: 6px;
+}
+
+.page-title p {
+    color: #aab5c5;
+    font-size: 13px;
+}
+
+.account-card {
+    background: #172235;
+    border: 1px solid #293a52;
+    border-radius: 15px;
+    padding: 22px;
+    margin-bottom: 20px;
+}
+
+.profile-icon {
+    width: 65px;
+    height: 65px;
+    background: #d5aa45;
+    color: #101827;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 27px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.account-card h3 {
+    margin: 0 0 18px;
+    color: #e3bd65;
+}
+
+.detail {
+    border-bottom: 1px solid #293a52;
+    padding: 13px 0;
+}
+
+.detail:last-child {
+    border-bottom: none;
+}
+
+.detail label {
+    display: block;
+    color: #9ca9ba;
+    font-size: 12px;
+    margin-bottom: 7px;
+}
+
+.detail strong {
+    font-size: 15px;
+    overflow-wrap: anywhere;
+}
+
+input {
+    width: 100%;
+    padding: 14px;
+    margin-top: 9px;
+    margin-bottom: 15px;
+    background: #101827;
+    color: white;
+    border: 1px solid #35445a;
+    border-radius: 9px;
+    outline: none;
+}
+
+input:focus {
+    border-color: #d5aa45;
+}
+
+label {
+    font-size: 13px;
+    color: #dce3ed;
+}
+
+button {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 9px;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.primary {
+    background: #d5aa45;
+    color: #101827;
+}
+
+.primary:disabled {
+    opacity: 0.6;
+}
+
+#message {
+    display: none;
+    padding: 13px;
+    margin-top: 14px;
+    border-radius: 8px;
+    background: #293a52;
+    color: #e3bd65;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.security-note {
+    color: #aab5c5;
+    font-size: 12px;
+    line-height: 1.6;
+    margin-top: 15px;
+}
+
+.demo-warning {
+    text-align: center;
+    color: #e3bd65;
+    font-size: 11px;
+    margin-top: 25px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<header>
+    <div class="brand">LIGER-PAY</div>
+    <a href="index.html" class="back">← Dashboard</a>
+</header>
+
+<div class="page-title">
+    <h2>My Account</h2>
+    <p>Manage your LIGER-PAY account information.</p>
+</div>
+
+<div class="account-card">
+
+    <div class="profile-icon" id="profileIcon">L</div>
+
+    <h3>Personal Information</h3>
+
+    <div class="detail">
+        <label>Full Name</label>
+        <strong id="accountName">Loading...</strong>
+    </div>
+
+    <div class="detail">
+        <label>Phone Number</label>
+        <strong id="accountPhone">Loading...</strong>
+    </div>
+
+    <div class="detail">
+        <label>Account Type</label>
+        <strong>Demo Personal Account</strong>
+    </div>
+
+    <div class="detail">
+        <label>Account Status</label>
+        <strong>Active Demo Account</strong>
+    </div>
+
+</div>
+
+<div class="account-card">
+
+    <h3>Change Password</h3>
+
+    <form id="passwordForm">
+
+        <label for="currentPassword">Current Password</label>
+        <input
+            type="password"
+            id="currentPassword"
+            placeholder="Enter current password"
+            required
+        >
+
+        <label for="newPassword">New Password</label>
+        <input
+            type="password"
+            id="newPassword"
+            placeholder="Enter new password"
+            minlength="8"
+            maxlength="128"
+            required
+        >
+
+        <label for="confirmNewPassword">Confirm New Password</label>
+        <input
+            type="password"
+            id="confirmNewPassword"
+            placeholder="Confirm new password"
+            minlength="8"
+            maxlength="128"
+            required
+        >
+
+        <button type="submit" class="primary" id="changeButton">
+            Update Password
+        </button>
+
+    </form>
+
+    <div id="message"></div>
+
+    <p class="security-note">
+        Your new password will be hashed before being saved in this
+        demonstration application. Never share your password with anyone.
+    </p>
+
+</div>
+
+<p class="demo-warning">
+    DEMO VERSION — NOT A REAL FINANCIAL ACCOUNT
+</p>
+
+</div>
+
+<script src="script.js"></script>
+
+<script>
+/* =====================================
+   LOAD ACCOUNT INFORMATION
+===================================== */
+
+function loadAccountDetails() {
+
+    let profile = null;
+
+    try {
+        profile = JSON.parse(
+            localStorage.getItem("ligerDemoProfile") || "null"
+        );
+    } catch (error) {
+        profile = null;
+    }
+
+    if (!profile) {
+        window.location.href = "login.html";
+        return;
+    }
+
+    document.getElementById("accountName").textContent =
+        profile.name || "Not available";
+
+    document.getElementById("accountPhone").textContent =
+        profile.phone || "Not available";
+
+    document.getElementById("profileIcon").textContent =
+        (profile.name || "L").charAt(0).toUpperCase();
+}
+
+loadAccountDetails();
+
+/* =====================================
+   ACCOUNT MESSAGES
+===================================== */
+
+function accountMessage(text) {
+
+    const message = document.getElementById("message");
+
+    message.textContent = text;
+    message.style.display = "block";
+}
+
+/* =====================================
+   CHANGE PASSWORD
+===================================== */
+
+const passwordForm = document.getElementById("passwordForm");
+
+passwordForm.addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    const currentPassword =
+        document.getElementById("currentPassword").value;
+
+    const newPassword =
+        document.getElementById("newPassword").value;
+
+    const confirmPassword =
+        document.getElementById("confirmNewPassword").value;
+
+    const button = document.getElementById("changeButton");
+
+    let profile = null;
+
+    try {
+        profile = JSON.parse(
+            localStorage.getItem("ligerDemoProfile") || "null"
+        );
+    } catch (error) {
+        profile = null;
+    }
+
+    if (!profile) {
+        accountMessage("Account information could not be found.");
+        return;
+    }
+
+    if (!profile.passwordHash || !profile.passwordSalt) {
+        accountMessage("Your account needs to be registered again.");
+        return;
+    }
+
+    if (newPassword.length < 8) {
+        accountMessage("Your new password must have at least 8 characters.");
+        return;
+    }
+
+    if (newPassword.length > 128) {
+        accountMessage("Your new password is too long.");
+        return;
+    }
+
+    if (newPassword !== confirmPassword) {
+        accountMessage("The new passwords do not match.");
+        return;
+    }
+
+    if (currentPassword === newPassword) {
+        accountMessage("Choose a different password.");
+        return;
+    }
+
+    button.disabled = true;
+    button.textContent = "Updating...";
+
+    try {
+
+        const validCurrentPassword = await verifyPassword(
+            currentPassword,
+            profile
+        );
+
+        if (!validCurrentPassword) {
+            accountMessage("Your current password is incorrect.");
+            return;
+        }
+
+        const salt = crypto.getRandomValues(
+            new Uint8Array(16)
+        );
+
+        const hash = await createPasswordHash(
+            newPassword,
+            salt
+        );
+
+        profile.passwordSalt = bytesToBase64(salt);
+        profile.passwordHash = bytesToBase64(hash);
+
+        localStorage.setItem(
+            "ligerDemoProfile",
+            JSON.stringify(profile)
+        );
+
+        passwordForm.reset();
+
+        accountMessage("Your password has been updated successfully!");
+
+    } catch (error) {
+
+        accountMessage(
+            error.message || "Password update failed. Please try again."
+        );
+
+    } finally {
+
+        button.disabled = false;
+        button.textContent = "Update Password";
+    }
+
+});
+</script>
+
+<script src="security.js"></script>
+
+</body>
+</html>
